@@ -220,9 +220,6 @@
     border-radius:20px;
     transform:translateY(-6px);
   }
-  /* Persistent highlight for the current section — stays lit without
-     needing hover, so a mobile tap shows the same "selected" blue the
-     desktop hover gives, instead of the color disappearing right away. */
   .vertical-menu a.active{
     background:linear-gradient(to right, var(--purple), var(--blue));
     border-radius:20px;
@@ -276,9 +273,6 @@
     pointer-events:none;
     z-index:0;
   }
-  /* Floor axis guides — the same red/green ground-plane convention every
-     3D viewport (Blender, Maya, C4D) uses, so the hero floor reads as a
-     scene, not a decorative grid. */
   .axis-line{ position:absolute; opacity:.55; }
   .axis-line.axis-x{ left:0; right:0; top:50%; height:1.5px; background:linear-gradient(90deg, transparent, var(--axis-x) 45%, var(--axis-x) 55%, transparent); }
   .axis-line.axis-y{ top:0; bottom:0; left:50%; width:1.5px; background:linear-gradient(180deg, transparent, var(--axis-y) 45%, var(--axis-y) 55%, transparent); }
@@ -311,9 +305,6 @@
     opacity:0;
     animation:hero-photo-in 1s cubic-bezier(.25,1,.5,1) .3s forwards;
   }
-  /* Tahan animasi entrance hero selama preloader masih tampil, supaya
-     tidak jalan/selesai duluan sebelum aset (font, foto, bg) benar-benar
-     siap ditampilkan — terutama saat deploy dengan koneksi/cache dingin. */
   html.is-loading .details > *,
   html.is-loading .profile-photo,
   html.is-loading .status-dot::after,
@@ -328,9 +319,6 @@
 
   .details{ max-width:620px; }
 
-  /* "Available for work" status pill — sits above the kicker. The dot
-     uses a small solid core plus an expanding, fading ring (::after) so
-     it reads as a living / pulsing indicator, like an "online" status. */
   .status-badge{
     display:inline-flex; align-items:center; gap:9px;
     padding:8px 16px 8px 12px;
@@ -445,11 +433,6 @@
   .social-icons img{ width:55%; height:55%; object-fit:contain; pointer-events:none; transition:transform .5s cubic-bezier(.25,1,.5,1); }
   .social-icons a:hover img{ transform:rotate(360deg); }
 
-  /* ---- Profile "viewport" — framed like a 3D software viewport: a
-     turntable ring (render turntables are how animators show off a model),
-     an axis gizmo, corner brackets, and a HUD strip. Ties the hero photo
-     directly to the 3D-animation identity instead of a generic circle
-     avatar. The clay→color hover swap now reads as "unshaded vs rendered". */
   .profile-photo{
     position:relative;
     flex-shrink:0;
@@ -458,11 +441,6 @@
   }
   .viewport-ring{
     position:absolute;
-    /* Shifted 3px down from a perfectly symmetric -22px inset so the ring
-       sits centered on the photo rather than centered on the whole
-       .profile-photo box. Left/right stay equal (ring stays circular);
-       top is 3px smaller and bottom is 3px larger than before, so the
-       overall diameter is unchanged — only the vertical position moves. */
     inset:-19px -22px -25px -22px;
     border-radius:50%;
     border:1px dashed rgba(94,154,163,.35);
@@ -503,7 +481,6 @@
 
   .viewport-gizmo{ position:absolute; top:12px; right:12px; width:34px; height:34px; z-index:2; opacity:.9; }
 
-  /* ===================== SHARED SECTION STYLES ===================== */
   main{ position:relative; z-index:1; }
   .section{ padding:96px 0; scroll-margin-top:var(--topbar-h); }
   .section-head{ max-width:640px; margin-bottom:48px; }
@@ -514,7 +491,6 @@
   .reveal{ opacity:0; transform:translateY(20px); transition:opacity .6s ease, transform .6s ease; }
   .reveal.in{ opacity:1; transform:translateY(0); }
 
-  /* ===================== SERVICES ===================== */
   .service-grid{ display:grid; grid-template-columns:repeat(3, 1fr); gap:22px; perspective:1000px; }
   .service-card{
     opacity:0;
@@ -549,7 +525,6 @@
     .service-card, .service-card-tilt{ transform:none !important; opacity:1 !important; }
   }
 
-  /* ===================== PORTFOLIO ===================== */
   .filter-chips{ display:flex; flex-wrap:wrap; gap:10px; margin-bottom:32px; }
   .chip{
     font-family:var(--font-body); font-size:13px; font-weight:500;
@@ -588,7 +563,6 @@
   .card-body p{ font-size:13.5px; color:var(--ink-dim); line-height:1.55; }
   .empty-state{ color:var(--ink-dim); font-size:14px; padding:40px 0; text-align:center; }
 
-  /* ===================== PROJECT DETAIL MODAL ===================== */
   .project-modal{
     position:fixed; inset:0; z-index:100;
     display:flex; align-items:center; justify-content:center;
@@ -654,7 +628,6 @@
   .media-box:hover{ transform:scale(1.02); }
   .media-box video, .media-box img, .media-box iframe{ width:100%; height:100%; object-fit:cover; border:none; display:block; }
   .media-fallback-label{ font-family:var(--font-display); font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-dim); }
-  /* Video boxes span the full width, stacked at the top of the grid */
   .media-video{ grid-column:1 / -1; aspect-ratio:16/9; }
   @media (max-width:640px){
     .project-media-grid{ grid-template-columns:1fr; }
@@ -664,7 +637,6 @@
     .project-modal, .project-modal-panel, .media-box{ transition:none !important; }
   }
 
-  /* ===================== EDUCATION ===================== */
   .timeline{ position:relative; padding-left:28px; max-width:680px; }
   .timeline::before{
     content:''; position:absolute; left:6px; top:6px; bottom:6px; width:1px;
@@ -678,9 +650,6 @@
     position:relative; padding-bottom:36px;
     opacity:0; transform:translateY(18px);
     transition:opacity .5s ease, transform .5s ease;
-    /* transition-delay is set dynamically by JS below, based on each
-       item's position in the list — this makes the stagger scale
-       automatically no matter how many .tl-item entries are added. */
   }
   .tl-item:last-child{ padding-bottom:0; }
   .timeline.in .tl-item{ opacity:1; transform:translateY(0); }
@@ -699,12 +668,8 @@
     .timeline::before, .tl-item, .tl-item::before{ transition:none !important; transform:none !important; opacity:1 !important; }
   }
 
-  /* ===================== CONTACT ===================== */
   #contact .wrap{ perspective:900px; }
 
-  /* Entrance wrapper: slides/scales the whole card in on scroll. Kept
-     separate from .contact-card so this transform never fights with the
-     card's own mousemove tilt transform below. */
   .contact-card-wrap{
     opacity:0;
     transform:translateY(36px) scale(.94);
@@ -728,7 +693,6 @@
     .contact-card-wrap{ opacity:1 !important; transform:none !important; }
   }
 
-  /* Text + actions fade/slide up one after another once the card is in view. */
   .contact-card h2,
   .contact-card .contact-actions{
     opacity:0;
@@ -771,7 +735,6 @@
     .logo-link:hover .logo, .logo-link:focus-visible .logo{ animation:none; }
   }
 
-  /* ===================== RESPONSIVE ===================== */
   @media (max-width:1080px){
     .service-grid, .portfolio-grid{ grid-template-columns:repeat(2, 1fr); }
   }
@@ -791,10 +754,6 @@
     }
     @keyframes slide-in-mobile{ to{ transform:translateY(0); opacity:1; } }
 
-    /* Collapsed to just the round toggle icon (pinned to the left corner)
-       by default, same idea as desktop — tapping it grows the bar out
-       to the right edge and reveals the links. This is what keeps a
-       thumb that's scrolling the page from ever landing on a nav link. */
     .menu-toggle{ display:flex; margin:0; flex-shrink:0; }
     .vertical-menu.open{ right:16px; justify-content:space-between; }
     .vertical-menu a{
@@ -827,7 +786,6 @@
 </head>
 <body>
 
-<!-- ===== PRELOADER: menutup layar sampai window.onload + font selesai ===== -->
 <div class="preloader" id="preloader" aria-hidden="true">
   <div class="preloader-inner">
     <img src="pict/logo.png" alt="" class="preloader-logo">
@@ -836,7 +794,6 @@
 </div>
 <noscript><style>.preloader{display:none !important;} html.is-loading{overflow:auto !important;}</style></noscript>
 
-<!-- ===== TOPBAR: logo + search (mencari proyek di section Portfolio) ===== -->
 <div class="topbar" id="topbar">
   <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
   <div class="wrap">
@@ -1146,12 +1103,6 @@
   </div>
 </footer>
 
-<!-- ===== PROJECT DETAIL "PAGE" (modal) =====
-     Opens when a Portfolio box is clicked. Content is built dynamically by
-     JS from each portfolio-card's data-youtube / data-photos attributes
-     above, so project 1-2 show an embedded YouTube video + photos and
-     project 3-6 show photos only. GANTI: put your real files at the paths
-     listed in those data-* attributes. -->
 <div class="project-modal" id="projectModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="projectModalTitle">
   <div class="project-modal-overlay" id="projectModalOverlay"></div>
   <div class="project-modal-panel">
@@ -1167,12 +1118,6 @@
 </div>
 
 <script>
-/* ===== PRELOADER CONTROL =====
-   Menunggu window benar-benar selesai load (semua gambar/CSS bg selesai
-   fetch) DAN font web selesai siap, baru melepas class "is-loading" dari
-   <html>. Selama class itu masih ada, semua animasi entrance hero
-   di-pause lewat CSS, jadi animasi selalu mulai dari kondisi bersih —
-   tidak peduli cepat/lambatnya koneksi user saat pertama buka web. */
 (function(){
   var html = document.documentElement;
   var preloader = document.getElementById('preloader');
@@ -1188,8 +1133,6 @@
     }
   }
 
-  // Preloader tampil tepat 2 detik, lalu langsung dilepas — tidak
-  // menunggu window.onload/font lagi.
   setTimeout(revealSite, 2000);
 })();
 
@@ -1227,8 +1170,6 @@
   document.addEventListener('scroll', onScroll, { passive:true });
   onScroll();
 
-  /* Scroll progress bar in the topbar — fills left-to-right based on how
-     far down the page the user has scrolled. */
   var scrollProgress = document.getElementById('scrollProgress');
   function updateScrollProgress(){
     var docHeight = document.documentElement.scrollHeight - window.innerHeight;
@@ -1354,12 +1295,6 @@
     sections.forEach(function(s){ navObserver.observe(s); });
   }
 
-  /* ===================== TIMELINE STAGGER (auto-scaling) =====================
-     Instead of hardcoding transition-delay per :nth-child in CSS (which
-     silently stops working once more .tl-item elements are added by hand),
-     we compute each item's delay here in JS based on its actual index.
-     This means the Education & Works list can grow to any length and every
-     new item will automatically join the same staggered "flow" animation. */
   var timelines = Array.prototype.slice.call(document.querySelectorAll('.timeline'));
   timelines.forEach(function(tl){
     var items = Array.prototype.slice.call(tl.querySelectorAll('.tl-item'));
@@ -1479,10 +1414,6 @@
     });
   }
 
-  /* ===================== SERVICE CARDS -> PORTFOLIO SHORTCUT ===================== */
-  /* Clicking a Services box (3D Animation / Graphic Design / UI/UX) jumps
-     down to Portfolio and applies the matching filter chip. The box zooms in
-     slightly while pressed and zooms back out on release (no bounce). */
   var serviceCards = Array.prototype.slice.call(document.querySelectorAll('.service-card'));
   serviceCards.forEach(function(card){
     var tilt = card.querySelector('.service-card-tilt');
@@ -1545,11 +1476,6 @@
     });
   }
 
-  /* ===================== PORTFOLIO PROJECT MODAL ===================== */
-  /* Clicking a portfolio card opens a full detail "page" (modal overlay) for
-     that project. Media is built per-project from data-youtube / data-photos
-     on the .portfolio-card (see markup above): project 1-2 get an embedded
-     YouTube video + photos, project 3-6 get photos only. */
   var projectModal = document.getElementById('projectModal');
   var projectModalTitle = document.getElementById('projectModalTitle');
   var projectModalTag = document.getElementById('projectModalTag');
@@ -1616,8 +1542,6 @@
     projectModal.classList.remove('open');
     projectModal.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
-    // Stop YouTube playback by clearing the media area once the close
-    // transition finishes.
     setTimeout(function(){
       if(!projectModal.classList.contains('open')){
         projectModalMedia.innerHTML = '';
@@ -1626,12 +1550,7 @@
     if(lastFocusedEl){ lastFocusedEl.focus(); }
   }
 
-  /* Press-to-open interaction: mousedown/touchstart shrinks the card
-     (zoom out) to show it being "pressed"; on release it snaps back with a
-     quick zoom-in overshoot, and only once that pop finishes does the
-     project detail modal actually open. Keyboard users (Enter/Space) get
-     the same pop-then-open sequence for a consistent feel. */
-  var TAP_MOVE_THRESHOLD = 10; // px a touch can drift and still count as a tap, not a scroll
+  var TAP_MOVE_THRESHOLD = 10;
 
   cards.forEach(function(card){
     card.tabIndex = 0;
@@ -1650,9 +1569,6 @@
       card.style.setProperty('--press', '0.93');
     }
 
-    // If a touch moves more than the threshold before it lifts, the user
-    // is scrolling the page, not tapping the card — cancel the press so
-    // the modal doesn't pop open underneath the scroll gesture.
     function trackTouchMove(e){
       if(!isPressed || touchScrolling || !e.touches || !e.touches.length) return;
       var dx = e.touches[0].clientX - touchStartX;
@@ -1685,13 +1601,10 @@
         openProjectModal(card);
       }
 
-      // Force reflow so the zoom-release animation restarts cleanly even
-      // if it was already applied a moment ago.
       card.classList.remove('zoom-release');
       void card.offsetWidth;
       card.classList.add('zoom-release');
       card.addEventListener('animationend', finishOpen);
-      // Fallback in case animationend doesn't fire for some reason.
       setTimeout(finishOpen, 260);
     }
 
