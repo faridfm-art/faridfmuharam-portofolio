@@ -782,18 +782,21 @@
     .search-bar.open .search-input{ width:150px; }
 
     .vertical-menu{
-      left:50%; right:auto; top:auto; bottom:16px; width:auto;
-      flex-direction:row; align-items:center; justify-content:center;
+      left:16px; right:calc(100% - 76px); top:auto; bottom:16px; width:auto;
+      flex-direction:row; align-items:center; justify-content:flex-start;
       border-radius:50px; padding:8px;
-      transform:translate(-50%, 100px); opacity:0;
+      transform:translateY(100px); opacity:0;
+      transition:right .45s cubic-bezier(.34,1.56,.64,1);
       animation:slide-in-mobile .5s ease .3s forwards;
     }
-    @keyframes slide-in-mobile{ to{ transform:translate(-50%,0); opacity:1; } }
+    @keyframes slide-in-mobile{ to{ transform:translateY(0); opacity:1; } }
 
-    /* Collapsed to just the round toggle icon by default, same as desktop —
-       links expand out sideways only after a tap. This is what keeps a
+    /* Collapsed to just the round toggle icon (pinned to the left corner)
+       by default, same idea as desktop — tapping it grows the bar out
+       to the right edge and reveals the links. This is what keeps a
        thumb that's scrolling the page from ever landing on a nav link. */
-    .menu-toggle{ display:flex; margin:0; }
+    .menu-toggle{ display:flex; margin:0; flex-shrink:0; }
+    .vertical-menu.open{ right:16px; justify-content:space-between; }
     .vertical-menu a{
       width:0; max-width:0; padding:0; margin:0;
       max-height:44px; opacity:0; overflow:hidden; pointer-events:none;
@@ -801,7 +804,7 @@
         margin .35s cubic-bezier(.34,1.56,.64,1), padding .35s ease;
     }
     .vertical-menu.open a{
-      width:44px; max-width:44px; padding:0; margin:0 3px;
+      width:44px; max-width:44px; padding:0; margin:0 2px;
       opacity:1; overflow:visible; pointer-events:auto;
     }
     .vertical-menu a:hover, .vertical-menu a:focus-visible{ transform:none; }
@@ -1074,7 +1077,7 @@
       <div class="timeline reveal">
         <div class="tl-item">
           <span class="tl-period">2017 — 2020</span>
-          <h3>SMAN 4 Tasikmalaya - Math and Science</h3>
+          <h3>SMAN 4 Tasikmalaya, Math and Science</h3>
           <p>Gained graphic design and video editing skills through school extracurriculars to create promotional media for events.</p>
         </div>
         <div class="tl-item">
