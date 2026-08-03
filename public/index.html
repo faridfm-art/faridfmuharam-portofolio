@@ -691,12 +691,12 @@
     transition:left .45s cubic-bezier(.25,1,.5,1), transform .45s cubic-bezier(.25,1,.5,1);
   }
   .service-card-tilt:hover .service-heading,
-  .service-card-tilt:focus-within .service-heading{
+  .service-card-tilt:focus-visible .service-heading{
     left:0;
     transform:translateX(0);
   }
   .service-card-tilt:hover,
-  .service-card-tilt:focus-within{
+  .service-card-tilt:focus-visible{
     box-shadow:0 20px 40px rgba(0,0,0,.4);
     border-color:var(--teal-light);
   }
@@ -713,7 +713,7 @@
     transition:font-size .4s cubic-bezier(.25,1,.5,1), margin-bottom .4s ease, left .45s cubic-bezier(.25,1,.5,1), transform .45s cubic-bezier(.25,1,.5,1);
   }
   .service-card-tilt:hover .num,
-  .service-card-tilt:focus-within .num{
+  .service-card-tilt:focus-visible .num{
     font-size:15px;
     left:0;
     transform:translateX(0);
@@ -725,7 +725,7 @@
     transition:font-size .4s cubic-bezier(.25,1,.5,1), margin-bottom .4s ease;
   }
   .service-card-tilt:hover h3,
-  .service-card-tilt:focus-within h3{
+  .service-card-tilt:focus-visible h3{
     font-size:18px;
   }
   .service-card p{
@@ -738,7 +738,7 @@
     transition:max-height .4s ease, opacity .3s ease .05s;
   }
   .service-card-tilt:hover p,
-  .service-card-tilt:focus-within p{
+  .service-card-tilt:focus-visible p{
     max-height:160px;
     opacity:1;
   }
@@ -791,7 +791,7 @@
     transition:max-height .4s ease, opacity .3s ease .05s, margin-top .4s ease;
   }
   .portfolio-card:hover .tool-badges,
-  .portfolio-card:focus-within .tool-badges{
+  .portfolio-card:focus-visible .tool-badges{
     max-height:60px;
     opacity:1;
   }
@@ -811,7 +811,7 @@
     transition:border-color .2s ease, color .2s ease, background .2s ease;
   }
   .portfolio-card:hover .tool-badge,
-  .portfolio-card:focus-within .tool-badge{
+  .portfolio-card:focus-visible .tool-badge{
     border-color:var(--teal-light);
     color:var(--ink);
   }
@@ -849,22 +849,22 @@
     transition:left .45s cubic-bezier(.25,1,.5,1), transform .45s cubic-bezier(.25,1,.5,1);
   }
   .portfolio-card:hover .card-heading,
-  .portfolio-card:focus-within .card-heading{
+  .portfolio-card:focus-visible .card-heading{
     left:0;
     transform:translateX(0);
   }
   .portfolio-card:hover .tag,
-  .portfolio-card:focus-within .tag{
+  .portfolio-card:focus-visible .tag{
     font-size:10px;
     left:0;
     transform:translateX(0);
   }
   .portfolio-card:hover .card-body h3,
-  .portfolio-card:focus-within .card-body h3{
+  .portfolio-card:focus-visible .card-body h3{
     font-size:15px;
   }
   .portfolio-card:hover .card-body p,
-  .portfolio-card:focus-within .card-body p{
+  .portfolio-card:focus-visible .card-body p{
     max-height:160px; opacity:1;
   }
   .empty-state{ color:var(--ink-dim); font-size:14px; padding:40px 0; text-align:center; }
