@@ -622,17 +622,18 @@
     z-index:1;
     width:100%; height:100%;
     object-fit:cover; object-position:center top;
+    border:none;
+    outline:none;
     border-radius:var(--r-md);
-    box-shadow:0 20px 50px -20px rgba(0,0,0,.6);
     filter:saturate(0) contrast(1.05);
-    transform:scale(var(--sc, .94)) rotateX(var(--ry,0)) rotateY(var(--rx,0));
-    transition:transform .35s cubic-bezier(.25,1,.5,1), filter .4s ease, box-shadow .3s ease;
+    transform:scale(var(--sc,1)) rotateX(var(--ry,0)) rotateY(var(--rx,0));
+    transition:transform .35s cubic-bezier(.25,1,.5,1);
     will-change:transform;
   }
   .profile-photo:hover img,
   .profile-photo.is-hovering img{
-    filter:saturate(1) contrast(1);
-    box-shadow:0 26px 60px -18px rgba(0,0,0,.7);
+    filter:none;
+    box-shadow:none;
   }
   .photo-fallback{ font-family:var(--font-body); font-size:13px; color:var(--ink-dim); text-align:center; }
 
@@ -2113,11 +2114,11 @@
       var y = (e.clientY - rect.top) / rect.height - 0.5;
       profilePhotoImg.style.setProperty('--rx', (x * 16) + 'deg');
       profilePhotoImg.style.setProperty('--ry', (y * -16) + 'deg');
-      profilePhotoImg.style.setProperty('--sc', '1');
+      profilePhotoImg.style.setProperty('--sc', '1.06');
     });
     profilePhoto.addEventListener('mouseenter', function(){
       profilePhoto.classList.add('is-hovering');
-      profilePhotoImg.style.setProperty('--sc', '1');
+      profilePhotoImg.style.setProperty('--sc', '1.06');
     });
     profilePhoto.addEventListener('mouseleave', function(){
       profilePhoto.classList.remove('is-hovering');
