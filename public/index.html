@@ -93,23 +93,93 @@
   }
 
   /* ===================== TOPBAR ===================== */
+  /*
+    Smooth header <-> floating-pill morph
+    --------------------------------------
+    Instead of flipping a single "scrolled" class and letting a CSS
+    transition race to catch up (which reads as a stepped snap when the
+    user scrolls quickly, and as a stalled jump when they reverse
+    direction mid-scroll), the whole shape is driven every animation
+    frame by one continuous, eased value: --morph (0 → 1), set on
+    #topbar by JS. All the shape-changing properties below are pure
+    calc() expressions of --morph, so the header and the pill are really
+    just the two endpoints of a single continuous curve — scrolling up
+    or down simply walks back and forth along that curve, exactly like
+    the reference video.
+  */
   .topbar{
     position:sticky; top:0; z-index:60;
     padding:16px 0;
-    transition:background .3s ease, box-shadow .3s ease, backdrop-filter .3s ease;
+    --morph:0;
   }
+  /* gentle float once the bar has fully become a pill */
   .topbar.scrolled{
-    background:var(--glass-strong);
-    backdrop-filter:blur(14px);
-    box-shadow:0 8px 24px rgba(0,0,0,.35);
+    animation:topbar-float 3.6s ease-in-out .65s infinite;
   }
-  .topbar .wrap{ display:flex; align-items:center; justify-content:space-between; gap:20px; }
+  .topbar .wrap{ display:block; }
+  .topbar-inner{
+    position:relative;
+    display:flex; align-items:center; justify-content:space-between; gap:20px;
+    width:100%;
+    max-width:calc(1600px - 880px * var(--morph));
+    margin:calc(10px * var(--morph)) auto 0;
+    padding:
+      calc(4px + 6px * var(--morph))
+      calc(4px + 10px * var(--morph))
+      calc(4px + 6px * var(--morph))
+      calc(4px + 22px * var(--morph));
+    border-radius:calc(999px * var(--morph));
+    transform:translateY(0);
+  }
+  @keyframes topbar-float{
+    0%,100%{ transform:translateY(0); }
+    50%{ transform:translateY(-5px); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .topbar.scrolled{ animation:none; }
+  }
 
-  .scroll-progress{
-    position:absolute; left:0; bottom:0; height:2px; width:0%;
-    background:linear-gradient(to right, var(--purple), var(--blue), var(--pink));
-    transition:width .15s ease-out;
+  /* Glass background + blur + shadow live on their own layer behind the
+     content and fade in purely via opacity, so the logo/search never
+     dim as the bar condenses — only the panel behind them appears. */
+  .topbar-glass{
+    position:absolute; inset:0;
+    z-index:0;
+    border-radius:inherit;
+    background:var(--glass-strong);
+    backdrop-filter:blur(calc(16px * var(--morph)));
+    -webkit-backdrop-filter:blur(calc(16px * var(--morph)));
+    box-shadow:0 14px 34px rgba(0,0,0,.45), 0 0 0 1px rgba(244,246,248,.08);
+    opacity:var(--morph);
     pointer-events:none;
+  }
+  .topbar-inner > .logo-link,
+  .topbar-inner > .search-bar{ position:relative; z-index:1; }
+
+  /* Progress ring that hugs the topbar-inner pill: a conic-gradient ring
+     (drawn via the padding + mask-exclude "gradient border" trick) whose
+     border-radius tracks the same --morph curve as the bar itself, so it
+     always traces the exact outline of the bar as it morphs.
+     --progress (0%-100%) controls how far around the ring is filled,
+     using a hard color-stop for a clean wipe effect. */
+  .scroll-ring{
+    position:absolute;
+    inset:-6px;
+    padding:2px;
+    border-radius:calc(999px * var(--morph));
+    pointer-events:none;
+    background:conic-gradient(from 0deg,
+      var(--purple) 0%,
+      var(--blue) calc(var(--progress, 0%) * 0.5),
+      var(--pink) var(--progress, 0%),
+      transparent var(--progress, 0%)
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+            mask-composite: exclude;
+    opacity:.95;
   }
 
   .logo-link{
@@ -136,11 +206,21 @@
     background-color:var(--teal-light);
     width:0; padding:10px 0; opacity:0; pointer-events:none;
     border-radius:20px 0 0 20px;
-    transition:width .3s ease, opacity .2s ease, padding .3s ease;
+    transform:scaleX(.85);
+    transform-origin:right center;
+    transition:width .4s cubic-bezier(.34,1.56,.64,1), opacity .25s ease, padding .35s ease,
+      transform .4s cubic-bezier(.34,1.56,.64,1), box-shadow .3s ease;
   }
   .search-input::placeholder{ color:rgba(244,246,248,.85); }
   .search-bar.open .search-input{
     width:190px; padding:10px 16px; opacity:1; pointer-events:auto;
+    transform:scaleX(1);
+    animation:search-glow 2.6s ease-in-out .4s infinite;
+  }
+  .search-input:focus{ box-shadow:0 0 0 3px rgba(247,143,179,.35); }
+  @keyframes search-glow{
+    0%,100%{ box-shadow:0 0 0 0 rgba(106,17,203,0); }
+    50%{ box-shadow:0 0 16px 1px rgba(106,17,203,.4); }
   }
   .search-button{
     display:flex; align-items:center; justify-content:center;
@@ -153,7 +233,10 @@
   }
   .search-bar.open .search-button{ border-radius:0 20px 20px 0; animation:none; }
   .search-button:hover{ transform:scale(1.08); animation-play-state:paused; }
-  .search-button img{ width:18px; height:18px; }
+  .search-button img{ width:18px; height:18px; transition:transform .4s cubic-bezier(.34,1.56,.64,1); }
+  .search-bar.open .search-button img{ transform:rotate(90deg) scale(1.05); }
+  .search-button:hover img{ transform:rotate(15deg); }
+  .search-bar.open .search-button:hover img{ transform:rotate(90deg) scale(1.05); }
   @keyframes search-pulse{
     0%,100%{ box-shadow:0 0 0 rgba(37,117,252,0); }
     50%{ box-shadow:0 0 14px rgba(106,17,203,.45); }
@@ -878,7 +961,10 @@
     .vertical-menu{ transform:translate(0,-50%); opacity:1; }
     .portfolio-card{ transform:none !important; }
     .search-button{ animation:none; }
+    .search-input{ animation:none; transform:none; }
+    .search-button img{ transition:none; }
     .logo-link:hover .logo, .logo-link:focus-visible .logo{ animation:none; }
+    .topbar.scrolled{ animation:none; }
   }
 
   @media (max-width:1080px){
@@ -960,16 +1046,19 @@
 <noscript><style>.preloader{display:none !important;} html.is-loading{overflow:auto !important;}</style></noscript>
 
 <div class="topbar" id="topbar">
-  <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
   <div class="wrap">
-    <a href="#home" class="logo-link" aria-label="Home">
-      <img src="pict/logo.png" alt="Logo" class="logo">
-    </a>
-    <div class="search-bar" id="searchBar">
-      <input type="text" id="searchInput" class="search-input" placeholder="Search projects…" aria-label="Search projects">
-      <button type="button" id="searchButton" class="search-button" aria-label="Search">
-        <img src="pict/search.png" alt="">
-      </button>
+    <div class="topbar-inner" id="topbarInner">
+      <div class="topbar-glass" aria-hidden="true"></div>
+      <div class="scroll-ring" id="scrollRing" aria-hidden="true"></div>
+      <a href="#home" class="logo-link" aria-label="Home">
+        <img src="pict/logo.png" alt="Logo" class="logo">
+      </a>
+      <div class="search-bar" id="searchBar">
+        <input type="text" id="searchInput" class="search-input" placeholder="Search projects…" aria-label="Search projects">
+        <button type="button" id="searchButton" class="search-button" aria-label="Search">
+          <img src="pict/search.png" alt="">
+        </button>
+      </div>
     </div>
   </div>
 </div>
@@ -1639,18 +1728,81 @@
     animateScrollTo(targetY, duration || 700);
   }
 
-  function onScroll(){
-    if(window.scrollY > 12){ topbar.classList.add('scrolled'); }
-    else{ topbar.classList.remove('scrolled'); }
-  }
-  document.addEventListener('scroll', onScroll, { passive:true });
-  onScroll();
+  /* ===================== SMOOTH HEADER <-> FLOATING PILL MORPH =====================
+     Rather than flipping a "scrolled" class and letting a CSS transition
+     race after it (which snaps/stutters on fast scrolls and stalls when
+     you reverse mid-scroll), --morph is a single continuous 0→1 value
+     recalculated every animation frame:
+       1) targetMorph is a hard function of scroll position (0 at the very
+          top, 1 once past MORPH_RANGE px) — always in sync with where the
+          page actually is, in both directions.
+       2) currentMorph eases toward targetMorph with a damped lerp each
+          frame, so the shape itself glides rather than jumping — this is
+          what makes it read as fluid as the reference video instead of a
+          two-state switch.
+     Every shape property on the bar (max-width, padding, margin,
+     border-radius, glass opacity/blur) is plain CSS calc() driven by this
+     one variable, so there is exactly one source of truth for the morph
+     at any scroll position. */
+  var MORPH_RANGE = 110;   // px of scroll over which the header fully condenses
+  var MORPH_EASE = 0.16;   // per-frame damping — lower = silkier/slower follow
+  var currentMorph = 0;
+  var targetMorph = 0;
+  var morphRafId = null;
+  var scrolledClassOn = false;
 
-  var scrollProgress = document.getElementById('scrollProgress');
+  function computeTargetMorph(){
+    return Math.min(Math.max(window.scrollY / MORPH_RANGE, 0), 1);
+  }
+
+  function morphTick(){
+    targetMorph = computeTargetMorph();
+    var delta = targetMorph - currentMorph;
+
+    if(reduceMotion || Math.abs(delta) < 0.0008){
+      currentMorph = targetMorph;
+    } else {
+      currentMorph += delta * MORPH_EASE;
+    }
+
+    topbar.style.setProperty('--morph', currentMorph.toFixed(4));
+
+    // the gentle floating bob only kicks in once the pill has essentially
+    // finished forming, so it never fights the morph transition itself
+    var shouldFloat = currentMorph > 0.985;
+    if(shouldFloat !== scrolledClassOn){
+      scrolledClassOn = shouldFloat;
+      topbar.classList.toggle('scrolled', scrolledClassOn);
+    }
+
+    if(reduceMotion){
+      morphRafId = null;
+      return;
+    }
+
+    if(Math.abs(targetMorph - currentMorph) > 0.0008){
+      morphRafId = requestAnimationFrame(morphTick);
+    } else {
+      morphRafId = null;
+    }
+  }
+
+  function requestMorphTick(){
+    if(morphRafId === null){
+      morphRafId = requestAnimationFrame(morphTick);
+    }
+  }
+
+  document.addEventListener('scroll', requestMorphTick, { passive:true });
+  window.addEventListener('resize', requestMorphTick);
+  morphTick();
+
+  var scrollRing = document.getElementById('scrollRing');
   function updateScrollProgress(){
     var docHeight = document.documentElement.scrollHeight - window.innerHeight;
     var pct = docHeight > 0 ? (window.scrollY / docHeight) * 100 : 0;
-    scrollProgress.style.width = Math.min(Math.max(pct, 0), 100) + '%';
+    pct = Math.min(Math.max(pct, 0), 100);
+    scrollRing.style.setProperty('--progress', pct + '%');
   }
   document.addEventListener('scroll', updateScrollProgress, { passive:true });
   window.addEventListener('resize', updateScrollProgress);
