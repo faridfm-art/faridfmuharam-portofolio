@@ -270,6 +270,46 @@
   .axis-line.axis-y{ top:0; bottom:0; left:50%; width:1.5px; background:linear-gradient(180deg, transparent, var(--axis-y) 45%, var(--axis-y) 55%, transparent); }
   .hero-inner{ position:relative; z-index:2; width:100%; padding:64px 0; will-change:transform, opacity; }
 
+  /* ===================== STARFIELD / PARTICLES ===================== */
+  .starfield-canvas{
+    position:absolute;
+    inset:0;
+    z-index:1;
+    pointer-events:none;
+    width:100%;
+    height:100%;
+    display:block;
+  }
+  @media (prefers-reduced-motion: reduce){
+    .starfield-canvas{ display:none; }
+  }
+
+  /* ===================== CURSOR SPOTLIGHT (box elements) ===================== */
+  .spotlight{
+    position:relative;
+    isolation:isolate;
+  }
+  .spotlight::before{
+    content:'';
+    position:absolute;
+    inset:0;
+    z-index:2;
+    border-radius:inherit;
+    background:radial-gradient(
+      260px circle at var(--mx, 50%) var(--my, 50%),
+      rgba(106,17,203,.20),
+      rgba(37,117,252,.12) 45%,
+      transparent 70%
+    );
+    opacity:0;
+    transition:opacity .35s ease;
+    pointer-events:none;
+  }
+  .spotlight.spotlight-active::before{ opacity:1; }
+  @media (prefers-reduced-motion: reduce){
+    .spotlight::before{ display:none; }
+  }
+
   .profile{
     display:flex; align-items:center; justify-content:space-between;
     gap:56px;
@@ -391,16 +431,67 @@
 
   .hero-actions{ margin-top:28px; }
   .btn-cv{
+    position:relative;
     display:inline-flex; align-items:center; gap:10px;
     font-family:var(--font-display); font-size:15px; font-weight:600;
     padding:14px 26px; border-radius:24px;
     background:linear-gradient(to right, var(--purple), var(--blue));
     color:#fff;
+    overflow:hidden;
     transform:scale(var(--press,1));
-    transition:transform .15s ease-out, box-shadow .2s ease;
+    transition:transform .15s ease-out, box-shadow .25s ease;
   }
-  .btn-cv:hover, .btn-cv:focus-visible{ box-shadow:0 10px 24px rgba(37,117,252,.35); }
-  .btn-cv svg{ width:18px; height:18px; flex-shrink:0; }
+  .btn-cv::before{
+    content:'';
+    position:absolute;
+    top:0; left:-120%;
+    width:60%; height:100%;
+    background:linear-gradient(115deg, transparent, rgba(255,255,255,.55), transparent);
+    transform:skewX(-18deg);
+    transition:left .55s ease;
+    pointer-events:none;
+  }
+  .btn-cv:hover::before, .btn-cv:focus-visible::before{ left:130%; }
+  .btn-cv::after{
+    content:'';
+    position:absolute; inset:0;
+    border-radius:inherit;
+    box-shadow:0 0 0 0 rgba(247,143,179,.55);
+    transition:box-shadow .4s ease;
+    pointer-events:none;
+  }
+  .btn-cv:hover, .btn-cv:focus-visible{
+    box-shadow:0 10px 24px rgba(37,117,252,.35);
+    transform:translateY(-2px) scale(var(--press,1));
+  }
+  .btn-cv:hover::after, .btn-cv:focus-visible::after{
+    box-shadow:0 0 0 6px rgba(247,143,179,.16);
+  }
+  .btn-cv .btn-cv-ripple{
+    position:absolute;
+    border-radius:50%;
+    background:rgba(255,255,255,.55);
+    transform:translate(-50%,-50%) scale(0);
+    opacity:.8;
+    pointer-events:none;
+    animation:btn-cv-ripple-anim .6s ease-out forwards;
+  }
+  @keyframes btn-cv-ripple-anim{
+    0%{ transform:translate(-50%,-50%) scale(0); opacity:.6; }
+    100%{ transform:translate(-50%,-50%) scale(1); opacity:0; }
+  }
+  .btn-cv svg{ width:18px; height:18px; flex-shrink:0; position:relative; z-index:1; transition:transform .35s cubic-bezier(.34,1.56,.64,1); }
+  .btn-cv:hover svg, .btn-cv:focus-visible svg{ animation:btn-cv-bounce .6s ease; }
+  @keyframes btn-cv-bounce{
+    0%,100%{ transform:translateY(0); }
+    40%{ transform:translateY(3px); }
+    65%{ transform:translateY(-2px); }
+  }
+  .btn-cv span{ position:relative; z-index:1; }
+  @media (prefers-reduced-motion: reduce){
+    .btn-cv::before, .btn-cv svg{ transition:none; animation:none; }
+    .btn-cv .btn-cv-ripple{ display:none; }
+  }
 
   .social-icons{ display:flex; gap:16px; margin-top:32px; }
   .social-icons a{
@@ -909,6 +1000,7 @@
 </nav>
 
 <header class="hero" id="home">
+  <canvas class="starfield-canvas" id="starfieldCanvas" aria-hidden="true"></canvas>
   <div class="hero-grid" aria-hidden="true">
     <span class="axis-line axis-x"></span>
     <span class="axis-line axis-y"></span>
@@ -932,7 +1024,7 @@
                 <path d="M7 10l5 5 5-5"></path>
                 <path d="M4 19h16"></path>
               </svg>
-              Download CV
+              <span>Download CV</span>
             </a>
           </div>
         </div>
@@ -957,21 +1049,21 @@
       </div>
       <div class="service-grid reveal">
         <div class="service-card" data-filter="3d">
-          <div class="service-card-tilt" tabindex="0" role="button" aria-label="Lihat proyek 3D Animation di Portfolio">
+          <div class="service-card-tilt spotlight" tabindex="0" role="button" aria-label="Lihat proyek 3D Animation di Portfolio">
             <span class="num">01</span>
             <h3>3D Animation</h3>
             <p>Bringing characters, products, and ideas to life through expressive movement and fluid motion in Blender.</p>
           </div>
         </div>
         <div class="service-card" data-filter="design">
-          <div class="service-card-tilt" tabindex="0" role="button" aria-label="Lihat proyek Graphic Design di Portfolio">
+          <div class="service-card-tilt spotlight" tabindex="0" role="button" aria-label="Lihat proyek Graphic Design di Portfolio">
             <span class="num">02</span>
             <h3>Graphic Design</h3>
             <p>Crafting clear, engaging visual designs for web promos, logos, social media campaigns, brand collateral, and digital illustrations.</p>
           </div>
         </div>
         <div class="service-card" data-filter="uiux">
-          <div class="service-card-tilt" tabindex="0" role="button" aria-label="Lihat proyek UI/UX di Portfolio">
+          <div class="service-card-tilt spotlight" tabindex="0" role="button" aria-label="Lihat proyek UI/UX di Portfolio">
             <span class="num">03</span>
             <h3>UI/UX</h3>
             <p>Creating clear, modern web and mobile UI/UX designs that balance aesthetics with effortless functionality.</p>
@@ -997,7 +1089,7 @@
       </div>
 
       <div class="portfolio-grid reveal" id="portfolioGrid">
-        <article class="portfolio-card" data-category="3d" data-title="Blender Showreel"
+        <article class="portfolio-card spotlight" data-category="3d" data-title="Blender Showreel"
           data-youtube="7LkRDoK1qb8">
           <div class="card-media">
             <img src="pict/project-1.jpg" alt="" draggable="false" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
@@ -1010,7 +1102,7 @@
           </div>
         </article>
 
-        <article class="portfolio-card" data-category="3d" data-title="Maya Showreel"
+        <article class="portfolio-card spotlight" data-category="3d" data-title="Maya Showreel"
           data-youtube="jCf395ERAik">
           <div class="card-media">
             <img src="pict/project-2.jpg" alt="" draggable="false" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
@@ -1023,7 +1115,7 @@
           </div>
         </article>
 
-        <article class="portfolio-card" data-category="design" data-title="Character Graphic Layout"
+        <article class="portfolio-card spotlight" data-category="design" data-title="Character Graphic Layout"
           data-photos="pict/project-3-photo-1.jpg,pict/project-3-photo-2.jpg,pict/project-3-photo-3.jpg,pict/project-3-photo-4.jpg,pict/project-3-photo-5.jpg,pict/project-3-photo-6.jpg,pict/project-3-photo-7.jpg,pict/project-3-photo-8.jpg,pict/project-3-photo-9.jpg,pict/project-3-photo-10.jpg,pict/project-3-photo-11.jpg">
           <div class="card-media">
             <img src="pict/project-3.jpg" alt="" draggable="false" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
@@ -1036,7 +1128,7 @@
           </div>
         </article>
 
-        <article class="portfolio-card" data-category="design" data-title="Event Promotion Graphic"
+        <article class="portfolio-card spotlight" data-category="design" data-title="Event Promotion Graphic"
           data-photos="pict/project-4-photo-1.jpg,pict/project-4-photo-2.jpg,pict/project-4-photo-3.jpg,pict/project-4-photo-4.jpg,pict/project-4-photo-5.jpg,pict/project-4-photo-6.jpg,pict/project-4-photo-7.jpg,pict/project-4-photo-8.jpg,pict/project-4-photo-9.jpg,pict/project-4-photo-10.jpg,pict/project-4-photo-11.jpg,pict/project-4-photo-12.jpg,pict/project-4-photo-13.jpg,pict/project-4-photo-14.jpg">
           <div class="card-media">
             <img src="pict/project-4.jpg" alt="" draggable="false" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
@@ -1049,7 +1141,7 @@
           </div>
         </article>
 
-        <article class="portfolio-card" data-category="uiux" data-title="UI/UX App Explorations"
+        <article class="portfolio-card spotlight" data-category="uiux" data-title="UI/UX App Explorations"
           data-photos="pict/project-5-photo-1.jpg,pict/project-5-photo-2.jpg">
           <div class="card-media">
             <img src="pict/project-5.jpg" alt="" draggable="false" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
@@ -1062,7 +1154,7 @@
           </div>
         </article>
 
-        <article class="portfolio-card" data-category="uiux" data-title="UI/UX Design Projects"
+        <article class="portfolio-card spotlight" data-category="uiux" data-title="UI/UX Design Projects"
           data-photos="pict/project-6-photo-1.jpg">
           <div class="card-media">
             <img src="pict/project-6.jpg" alt="" draggable="false" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
@@ -1132,7 +1224,7 @@
         <p class="eyebrow">Get In Touch</p>
       </div>
       <div class="contact-card-wrap reveal">
-        <div class="contact-card">
+        <div class="contact-card spotlight">
           <h2>Have a project in mind? Let's create something together.</h2>
           <div class="contact-actions">
             <a class="btn-email" href="mailto:faridfm2703@gmail.com">faridfm2703@gmail.com</a>
@@ -1160,7 +1252,7 @@
 
 <div class="project-modal" id="projectModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="projectModalTitle">
   <div class="project-modal-overlay" id="projectModalOverlay"></div>
-  <div class="project-modal-panel">
+  <div class="project-modal-panel spotlight">
     <button type="button" class="project-modal-close" id="projectModalClose" aria-label="Close project detail">
       <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
     </button>
@@ -1249,6 +1341,173 @@
       return false;
     }
   });
+})();
+
+/* ===================== STARFIELD / SHOOTING STARS (hero only) ===================== */
+(function(){
+  var canvas = document.getElementById('starfieldCanvas');
+  var hero = document.getElementById('home');
+  if(!canvas || !hero) return;
+
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduceMotion) return;
+
+  var ctx = canvas.getContext('2d');
+  var stars = [];
+  var shootingStars = [];
+  var width = 0, height = 0, dpr = Math.min(window.devicePixelRatio || 1, 2);
+  var running = true;
+
+  function resize(){
+    width = hero.clientWidth;
+    height = hero.clientHeight;
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+    canvas.style.width = width + 'px';
+    canvas.style.height = height + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    seedStars();
+  }
+
+  function seedStars(){
+    var count = Math.min(140, Math.round((width * height) / 9000));
+    stars = [];
+    for(var i = 0; i < count; i++){
+      stars.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        r: Math.random() * 1.3 + 0.35,
+        baseAlpha: Math.random() * 0.5 + 0.25,
+        twinkleSpeed: Math.random() * 0.015 + 0.004,
+        twinklePhase: Math.random() * Math.PI * 2
+      });
+    }
+  }
+
+  function spawnShootingStar(){
+    if(!running) return;
+    var startX = Math.random() * width * 0.7 + width * 0.15;
+    var startY = Math.random() * height * 0.35;
+    var angle = (Math.random() * 18 + 18) * (Math.PI / 180);
+    var speed = Math.random() * 6 + 7;
+    shootingStars.push({
+      x: startX,
+      y: startY,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      life: 0,
+      maxLife: Math.random() * 24 + 34,
+      len: Math.random() * 70 + 60
+    });
+  }
+
+  function scheduleShootingStar(){
+    var delay = Math.random() * 3800 + 2200;
+    setTimeout(function(){
+      if(running){ spawnShootingStar(); }
+      scheduleShootingStar();
+    }, delay);
+  }
+
+  function draw(){
+    if(!running) return;
+    ctx.clearRect(0, 0, width, height);
+
+    for(var i = 0; i < stars.length; i++){
+      var s = stars[i];
+      s.twinklePhase += s.twinkleSpeed;
+      var alpha = s.baseAlpha + Math.sin(s.twinklePhase) * 0.22;
+      if(alpha < 0) alpha = 0;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(244,246,248,' + alpha.toFixed(3) + ')';
+      ctx.fill();
+    }
+
+    for(var j = shootingStars.length - 1; j >= 0; j--){
+      var st = shootingStars[j];
+      st.x += st.vx;
+      st.y += st.vy;
+      st.life++;
+      var progress = st.life / st.maxLife;
+      var fade = progress < 0.15 ? (progress / 0.15) : Math.max(0, 1 - (progress - 0.15) / 0.85);
+      var tailX = st.x - (st.vx / Math.hypot(st.vx, st.vy)) * st.len;
+      var tailY = st.y - (st.vy / Math.hypot(st.vx, st.vy)) * st.len;
+
+      var grad = ctx.createLinearGradient(st.x, st.y, tailX, tailY);
+      grad.addColorStop(0, 'rgba(255,255,255,' + (0.95 * fade).toFixed(3) + ')');
+      grad.addColorStop(0.4, 'rgba(190,220,255,' + (0.5 * fade).toFixed(3) + ')');
+      grad.addColorStop(1, 'rgba(190,220,255,0)');
+
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = 1.6;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(st.x, st.y);
+      ctx.lineTo(tailX, tailY);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(st.x, st.y, 1.4, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255,255,255,' + (0.9 * fade).toFixed(3) + ')';
+      ctx.fill();
+
+      if(st.life >= st.maxLife || st.x > width + 100 || st.y > height + 100){
+        shootingStars.splice(j, 1);
+      }
+    }
+
+    requestAnimationFrame(draw);
+  }
+
+  var resizeTimer = null;
+  window.addEventListener('resize', function(){
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(resize, 150);
+  });
+
+  document.addEventListener('visibilitychange', function(){
+    running = !document.hidden;
+    if(running){ requestAnimationFrame(draw); }
+  });
+
+  resize();
+  requestAnimationFrame(draw);
+  setTimeout(spawnShootingStar, 900);
+  scheduleShootingStar();
+})();
+
+/* ===================== CURSOR SPOTLIGHT ON BOX ELEMENTS ===================== */
+(function(){
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduceMotion) return;
+
+  function attachSpotlight(el){
+    el.addEventListener('mousemove', function(e){
+      var rect = el.getBoundingClientRect();
+      var x = e.clientX - rect.left;
+      var y = e.clientY - rect.top;
+      el.style.setProperty('--mx', x + 'px');
+      el.style.setProperty('--my', y + 'px');
+    });
+    el.addEventListener('mouseenter', function(){
+      el.classList.add('spotlight-active');
+    });
+    el.addEventListener('mouseleave', function(){
+      el.classList.remove('spotlight-active');
+    });
+  }
+
+  function initSpotlights(){
+    var els = document.querySelectorAll('.spotlight');
+    els.forEach(function(el){ attachSpotlight(el); });
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', initSpotlights);
+  } else {
+    initSpotlights();
+  }
 })();
 
 (function(){
@@ -1384,6 +1643,23 @@
     btnCv.addEventListener('touchstart', btnCvPress, { passive:true });
     btnCv.addEventListener('touchend', btnCvRelease);
     btnCv.addEventListener('touchcancel', btnCvRelease);
+
+    btnCv.addEventListener('click', function(e){
+      var rect = btnCv.getBoundingClientRect();
+      var ripple = document.createElement('span');
+      ripple.className = 'btn-cv-ripple';
+      var size = Math.max(rect.width, rect.height) * 1.8;
+      var x = (e.clientX !== undefined ? e.clientX - rect.left : rect.width / 2);
+      var y = (e.clientY !== undefined ? e.clientY - rect.top : rect.height / 2);
+      ripple.style.width = size + 'px';
+      ripple.style.height = size + 'px';
+      ripple.style.left = x + 'px';
+      ripple.style.top = y + 'px';
+      btnCv.appendChild(ripple);
+      ripple.addEventListener('animationend', function(){
+        if(ripple.parentNode){ ripple.parentNode.removeChild(ripple); }
+      });
+    });
   }
 
   var wasDesktopNav = isDesktopNav();
