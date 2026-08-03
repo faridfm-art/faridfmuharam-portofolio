@@ -602,6 +602,7 @@
   }
   .viewport-ring{
     position:absolute;
+    top:50px;
     inset:-19px -22px -25px -22px;
     border-radius:50%;
     border:1px dashed rgba(94,154,163,.35);
@@ -665,22 +666,82 @@
   .service-grid.in .service-card:nth-child(3){ transition-delay:.35s; }
   .service-card-tilt{
     height:100%;
+    min-height:230px;
     background:var(--glass);
     border:1px solid var(--line);
     border-radius:var(--r-md);
     padding:28px;
     cursor:pointer;
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    justify-content:center;
+    text-align:left;
     transform:scale(calc(var(--sc,1) * var(--press,1))) rotateX(var(--ry,0)) rotateY(var(--rx,0));
     transition:transform .18s ease-out, box-shadow .3s ease, border-color .3s ease;
     will-change:transform;
   }
-  .service-card-tilt:hover{
+  .service-heading{
+    width:max-content;
+    max-width:100%;
+    position:relative;
+    left:50%;
+    transform:translateX(-50%);
+    text-align:center;
+    transition:left .45s cubic-bezier(.25,1,.5,1), transform .45s cubic-bezier(.25,1,.5,1);
+  }
+  .service-card-tilt:hover .service-heading,
+  .service-card-tilt:focus-within .service-heading{
+    left:0;
+    transform:translateX(0);
+  }
+  .service-card-tilt:hover,
+  .service-card-tilt:focus-within{
     box-shadow:0 20px 40px rgba(0,0,0,.4);
     border-color:var(--teal-light);
   }
-  .service-card .num{ font-family:var(--font-display); font-size:13px; color:var(--pink); margin-bottom:14px; display:block; }
-  .service-card h3{ font-size:19px; font-weight:600; margin-bottom:10px; }
-  .service-card p{ color:var(--ink-dim); font-size:14px; line-height:1.6; }
+  .service-card .num{
+    font-family:var(--font-display);
+    display:block;
+    width:max-content;
+    position:relative;
+    left:50%;
+    transform:translateX(-50%);
+    font-size:20px;
+    color:var(--pink);
+    margin-bottom:14px;
+    transition:font-size .4s cubic-bezier(.25,1,.5,1), margin-bottom .4s ease, left .45s cubic-bezier(.25,1,.5,1), transform .45s cubic-bezier(.25,1,.5,1);
+  }
+  .service-card-tilt:hover .num,
+  .service-card-tilt:focus-within .num{
+    font-size:15px;
+    left:0;
+    transform:translateX(0);
+  }
+  .service-card h3{
+    font-size:28px;
+    font-weight:600;
+    margin-bottom:10px;
+    transition:font-size .4s cubic-bezier(.25,1,.5,1), margin-bottom .4s ease;
+  }
+  .service-card-tilt:hover h3,
+  .service-card-tilt:focus-within h3{
+    font-size:18px;
+  }
+  .service-card p{
+    color:var(--ink-dim);
+    font-size:14px;
+    line-height:1.6;
+    max-height:0;
+    opacity:0;
+    overflow:hidden;
+    transition:max-height .4s ease, opacity .3s ease .05s;
+  }
+  .service-card-tilt:hover p,
+  .service-card-tilt:focus-within p{
+    max-height:160px;
+    opacity:1;
+  }
   @media (prefers-reduced-motion: reduce){
     .service-card, .service-card-tilt{ transform:none !important; opacity:1 !important; }
   }
@@ -1140,22 +1201,28 @@
       <div class="service-grid reveal">
         <div class="service-card" data-filter="3d">
           <div class="service-card-tilt spotlight" tabindex="0" role="button" aria-label="Lihat proyek 3D Animation di Portfolio">
+            <div class="service-heading">
             <span class="num">01</span>
             <h3>3D Animation</h3>
+            </div>
             <p>Bringing characters, products, and ideas to life through expressive movement and fluid motion in Blender.</p>
           </div>
         </div>
         <div class="service-card" data-filter="design">
           <div class="service-card-tilt spotlight" tabindex="0" role="button" aria-label="Lihat proyek Graphic Design di Portfolio">
+            <div class="service-heading">
             <span class="num">02</span>
             <h3>Graphic Design</h3>
+            </div>
             <p>Crafting clear, engaging visual designs for web promos, logos, social media campaigns, brand collateral, and digital illustrations.</p>
           </div>
         </div>
         <div class="service-card" data-filter="uiux">
           <div class="service-card-tilt spotlight" tabindex="0" role="button" aria-label="Lihat proyek UI/UX di Portfolio">
+            <div class="service-heading">
             <span class="num">03</span>
             <h3>UI/UX</h3>
+            </div>
             <p>Creating clear, modern web and mobile UI/UX designs that balance aesthetics with effortless functionality.</p>
           </div>
         </div>
