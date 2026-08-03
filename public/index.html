@@ -64,11 +64,6 @@
   }
 
   /* ===================== PRELOADER ===================== */
-  /* Menutup seluruh layar sampai window benar-benar selesai load (termasuk
-     font & gambar). Selama .is-loading masih ada di <html>, animasi
-     entrance hero di-pause (lihat aturan di bawah section HERO), jadi
-     animasi selalu mulai dari kondisi "siap tampil" — tidak peduli cepat
-     atau lambatnya koneksi user saat pertama kali membuka web. */
   .preloader{
     position:fixed; inset:0; z-index:200;
     display:flex; align-items:center; justify-content:center;
@@ -110,9 +105,6 @@
   }
   .topbar .wrap{ display:flex; align-items:center; justify-content:space-between; gap:20px; }
 
-  /* Scroll progress bar — thin gradient line along the bottom edge of the
-     topbar that fills in as the page is scrolled. Gives the header a
-     living, purposeful accent instead of a static flat bar. */
   .scroll-progress{
     position:absolute; left:0; bottom:0; height:2px; width:0%;
     background:linear-gradient(to right, var(--purple), var(--blue), var(--pink));
@@ -404,17 +396,11 @@
     padding:14px 26px; border-radius:24px;
     background:linear-gradient(to right, var(--purple), var(--blue));
     color:#fff;
-    transition:transform .2s ease, box-shadow .2s ease;
+    transform:scale(var(--press,1));
+    transition:transform .15s ease-out, box-shadow .2s ease;
   }
-  .btn-cv:hover, .btn-cv:focus-visible{ transform:translateY(-2px) scale(1.06); box-shadow:0 10px 24px rgba(37,117,252,.35); }
+  .btn-cv:hover, .btn-cv:focus-visible{ box-shadow:0 10px 24px rgba(37,117,252,.35); }
   .btn-cv svg{ width:18px; height:18px; flex-shrink:0; }
-  @keyframes btn-cv-pop{
-    0%{ transform:scale(1); }
-    35%{ transform:scale(.88); }
-    65%{ transform:scale(1.14); }
-    100%{ transform:scale(1); }
-  }
-  .btn-cv.pop{ animation:btn-cv-pop .5s cubic-bezier(.34,1.56,.64,1); }
 
   .social-icons{ display:flex; gap:16px; margin-top:32px; }
   .social-icons a{
@@ -438,6 +424,7 @@
     flex-shrink:0;
     width:clamp(220px, 26vw, 400px);
     aspect-ratio:1;
+    perspective:900px;
   }
   .viewport-ring{
     position:absolute;
@@ -456,30 +443,28 @@
   @keyframes spin-slow{ to{ transform:rotate(360deg); } }
   @media (prefers-reduced-motion: reduce){ .viewport-ring{ animation:none; } }
 
-  .viewport-frame{
+  .profile-photo img{
     position:relative;
     z-index:1;
     width:100%; height:100%;
+    object-fit:cover; object-position:center top;
     border-radius:var(--r-md);
-    overflow:hidden;
-    background:var(--bg-mid);
     box-shadow:0 20px 50px -20px rgba(0,0,0,.6);
+    filter:saturate(0) contrast(1.05);
+    transform:scale(var(--sc, .94)) rotateX(var(--ry,0)) rotateY(var(--rx,0));
+    transition:transform .35s cubic-bezier(.25,1,.5,1), filter .4s ease, box-shadow .3s ease;
+    will-change:transform;
   }
-  .viewport-frame img{
-    width:100%; height:100%; object-fit:cover; object-position:center top;
-    transform:scale(.94); filter:saturate(0) contrast(1.05);
-    transition:transform .4s ease, filter .4s ease;
+  .profile-photo:hover img,
+  .profile-photo.is-hovering img{
+    filter:saturate(1) contrast(1);
+    box-shadow:0 26px 60px -18px rgba(0,0,0,.7);
   }
-  .viewport-frame:hover img{ transform:scale(1); filter:saturate(1) contrast(1); }
   .photo-fallback{ font-family:var(--font-body); font-size:13px; color:var(--ink-dim); text-align:center; }
 
-  .viewport-corner{ position:absolute; width:16px; height:16px; opacity:.75; pointer-events:none; z-index:2; }
-  .viewport-corner.tl{ top:10px; left:10px; border-top:2px solid var(--teal-light); border-left:2px solid var(--teal-light); }
-  .viewport-corner.tr{ top:10px; right:10px; border-top:2px solid var(--teal-light); border-right:2px solid var(--teal-light); }
-  .viewport-corner.bl{ bottom:10px; left:10px; border-bottom:2px solid var(--teal-light); border-left:2px solid var(--teal-light); }
-  .viewport-corner.br{ bottom:10px; right:10px; border-bottom:2px solid var(--teal-light); border-right:2px solid var(--teal-light); }
-
-  .viewport-gizmo{ position:absolute; top:12px; right:12px; width:34px; height:34px; z-index:2; opacity:.9; }
+  @media (prefers-reduced-motion: reduce){
+    .profile-photo img{ transform:none !important; }
+  }
 
   main{ position:relative; z-index:1; }
   .section{ padding:96px 0; scroll-margin-top:var(--topbar-h); }
@@ -584,13 +569,13 @@
   .project-modal-panel{
     position:relative;
     z-index:1;
-    width:min(920px, 100%);
-    max-height:88vh;
+    width:min(1500px, 97%);
+    max-height:99vh;
     overflow-y:auto;
     background:var(--glass-strong);
     border:1px solid var(--line);
     border-radius:var(--r-lg);
-    padding:40px;
+    padding:55px;
     transform:translateY(24px) scale(.97);
     opacity:0;
     transition:transform .35s cubic-bezier(.25,1,.5,1), opacity .35s ease;
@@ -629,12 +614,82 @@
   .media-box video, .media-box img, .media-box iframe{ width:100%; height:100%; object-fit:cover; border:none; display:block; }
   .media-fallback-label{ font-family:var(--font-display); font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-dim); }
   .media-video{ grid-column:1 / -1; aspect-ratio:16/9; }
+
+  /* ===================== PROJECT GALLERY CAROUSEL (peek/drag) ===================== */
+  .project-media-grid.has-carousel{ display:block; }
+
+  .gallery-wrap{ width:100%; }
+  .gallery-carousel{
+    position:relative;
+    width:100%;
+    border-radius:var(--r-md);
+    overflow:hidden;
+    touch-action:pan-y;
+    cursor:grab;
+  }
+  .gallery-carousel.dragging{ cursor:grabbing; }
+  .gallery-track{
+    display:flex;
+    align-items:center;
+    will-change:transform;
+    transition:transform .45s cubic-bezier(.25,1,.5,1);
+  }
+  .gallery-track.no-transition{ transition:none; }
+  .gallery-slide{
+    position:relative;
+    flex:0 0 auto;
+    width:min(85%, 900px);
+    aspect-ratio:4/3;
+    margin:0 6px;
+    border-radius:var(--r-md);
+    overflow:hidden;
+    background:var(--bg-mid);
+    border:1px solid var(--line);
+    transform:scale(.78);
+    opacity:.4;
+    filter:saturate(.5) brightness(.7);
+    transition:transform .45s cubic-bezier(.25,1,.5,1), opacity .45s ease, filter .45s ease;
+    cursor:pointer;
+  }
+  .gallery-slide.is-active{
+    transform:scale(1);
+    opacity:1;
+    filter:none;
+    cursor:default;
+  }
+  .gallery-slide img{
+    width:100%; height:100%; object-fit:cover; display:block;
+    pointer-events:none; -webkit-user-drag:none; user-select:none;
+  }
+  .gallery-slide .media-fallback-label{ position:absolute; inset:0; display:none; align-items:center; justify-content:center; }
+
+  .gallery-arrow{
+    position:absolute; top:50%; transform:translateY(-50%);
+    width:40px; height:40px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    background:rgba(8,20,34,.65); border:1px solid var(--line); color:var(--ink);
+    backdrop-filter:blur(6px);
+    transition:background .2s ease, transform .2s ease, opacity .2s ease;
+    z-index:2;
+  }
+  .gallery-arrow:hover{ background:linear-gradient(to right, var(--purple), var(--blue)); }
+  .gallery-arrow.prev{ left:12px; }
+  .gallery-arrow.next{ right:12px; }
+  .gallery-arrow[disabled]{ opacity:.25; pointer-events:none; }
+
+  .gallery-dots{ display:flex; justify-content:center; gap:8px; margin-top:16px; }
+  .gallery-dot{ width:8px; height:8px; border-radius:50%; background:rgba(244,246,248,.25); border:none; padding:0; transition:background .25s ease, transform .25s ease; }
+  .gallery-dot.is-active{ background:linear-gradient(to right, var(--purple), var(--blue)); transform:scale(1.35); }
+
+  @media (prefers-reduced-motion: reduce){
+    .gallery-track, .gallery-slide{ transition:none !important; }
+  }
+
   @media (max-width:640px){
     .project-media-grid{ grid-template-columns:1fr; }
     .project-modal-panel{ padding:24px; }
-  }
-  @media (prefers-reduced-motion: reduce){
-    .project-modal, .project-modal-panel, .media-box{ transition:none !important; }
+    .gallery-arrow{ width:34px; height:34px; }
+    .gallery-slide{ margin:0 5px; }
   }
 
   .timeline{ position:relative; padding-left:28px; max-width:680px; }
@@ -782,6 +837,25 @@
     .service-grid, .portfolio-grid{ grid-template-columns:1fr; }
     .contact-card{ flex-direction:column; align-items:flex-start; padding:32px; }
   }
+
+  /* ===================== CONTENT PROTECTION ===================== */
+  img, video, iframe,
+  .card-media, .profile-photo, .gallery-slide, .media-box{
+    -webkit-user-select:none;
+    -moz-user-select:none;
+    -ms-user-select:none;
+    user-select:none;
+    -webkit-touch-callout:none; /* disable long-press menu on iOS */
+    -webkit-user-drag:none;
+    user-drag:none;
+  }
+  /* keep search input selectable/typable */
+  #searchInput{ -webkit-user-select:text; user-select:text; -webkit-touch-callout:default; }
+
+  .protect-shield{
+    position:absolute; inset:0; z-index:3;
+    background:transparent;
+  }
 </style>
 </head>
 <body>
@@ -861,31 +935,12 @@
               Download CV
             </a>
           </div>
-          <div class="social-icons">
-            <a href="https://www.instagram.com/faridfmuharam/" aria-label="Instagram" target="_blank" rel="noopener">
-              <img src="pict/instagram.png" alt="">
-            </a>
-            <a href="https://www.linkedin.com/in/faridfmuharam" aria-label="LinkedIn" target="_blank" rel="noopener">
-              <img src="pict/linkedin.png" alt="">
-            </a>
-            <a href="mailto:faridfm2703@gmail.com" aria-label="Email">
-              <img src="pict/mail.png" alt="">
-            </a>
-          </div>
         </div>
-        <div class="profile-photo">
+        <div class="profile-photo" id="profilePhoto">
           <div class="viewport-ring" aria-hidden="true"></div>
-              <line x1="20" y1="20" x2="20" y2="4" stroke="var(--axis-y)" stroke-width="2" stroke-linecap="round"></line>
-              <circle cx="20" cy="4" r="2.6" fill="var(--axis-y)"></circle>
-              <line x1="20" y1="20" x2="33" y2="27" stroke="var(--axis-x)" stroke-width="2" stroke-linecap="round"></line>
-              <circle cx="33" cy="27" r="2.6" fill="var(--axis-x)"></circle>
-              <line x1="20" y1="20" x2="9" y2="29" stroke="var(--axis-z)" stroke-width="2" stroke-linecap="round"></line>
-              <circle cx="9" cy="29" r="2.6" fill="var(--axis-z)"></circle>
-              <circle cx="20" cy="20" r="2" fill="var(--ink)"></circle>
-            </svg>
-            <img src="pict/profile.png" alt="Farid Fadillah Muharam" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-            <span class="photo-fallback" style="display:none;">Photo</span>
-          </div>
+          <img src="pict/profile.png" alt="Farid Fadillah Muharam" draggable="false" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+          <span class="photo-fallback" style="display:none;">Photo</span>
+          <span class="protect-shield" aria-hidden="true"></span>
         </div>
       </div>
     </div>
@@ -945,7 +1000,7 @@
         <article class="portfolio-card" data-category="3d" data-title="Blender Showreel"
           data-youtube="7LkRDoK1qb8">
           <div class="card-media">
-            <img src="pict/project-1.jpg" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <img src="pict/project-1.jpg" alt="" draggable="false" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
             <span class="media-fallback" style="display:none;">PROJECT 1</span>
           </div>
           <div class="card-body">
@@ -958,7 +1013,7 @@
         <article class="portfolio-card" data-category="3d" data-title="Maya Showreel"
           data-youtube="jCf395ERAik">
           <div class="card-media">
-            <img src="pict/project-2.jpg" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <img src="pict/project-2.jpg" alt="" draggable="false" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
             <span class="media-fallback" style="display:none;">PROJECT 2</span>
           </div>
           <div class="card-body">
@@ -971,7 +1026,7 @@
         <article class="portfolio-card" data-category="design" data-title="Character Graphic Layout"
           data-photos="pict/project-3-photo-1.jpg,pict/project-3-photo-2.jpg,pict/project-3-photo-3.jpg,pict/project-3-photo-4.jpg,pict/project-3-photo-5.jpg,pict/project-3-photo-6.jpg,pict/project-3-photo-7.jpg,pict/project-3-photo-8.jpg,pict/project-3-photo-9.jpg,pict/project-3-photo-10.jpg,pict/project-3-photo-11.jpg">
           <div class="card-media">
-            <img src="pict/project-3.jpg" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <img src="pict/project-3.jpg" alt="" draggable="false" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
             <span class="media-fallback" style="display:none;">PROJECT 3</span>
           </div>
           <div class="card-body">
@@ -984,7 +1039,7 @@
         <article class="portfolio-card" data-category="design" data-title="Event Promotion Graphic"
           data-photos="pict/project-4-photo-1.jpg,pict/project-4-photo-2.jpg,pict/project-4-photo-3.jpg,pict/project-4-photo-4.jpg,pict/project-4-photo-5.jpg,pict/project-4-photo-6.jpg,pict/project-4-photo-7.jpg,pict/project-4-photo-8.jpg,pict/project-4-photo-9.jpg,pict/project-4-photo-10.jpg,pict/project-4-photo-11.jpg,pict/project-4-photo-12.jpg,pict/project-4-photo-13.jpg,pict/project-4-photo-14.jpg">
           <div class="card-media">
-            <img src="pict/project-4.jpg" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <img src="pict/project-4.jpg" alt="" draggable="false" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
             <span class="media-fallback" style="display:none;">PROJECT 4</span>
           </div>
           <div class="card-body">
@@ -997,7 +1052,7 @@
         <article class="portfolio-card" data-category="uiux" data-title="UI/UX App Explorations"
           data-photos="pict/project-5-photo-1.jpg,pict/project-5-photo-2.jpg">
           <div class="card-media">
-            <img src="pict/project-5.jpg" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <img src="pict/project-5.jpg" alt="" draggable="false" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
             <span class="media-fallback" style="display:none;">PROJECT 5</span>
           </div>
           <div class="card-body">
@@ -1010,7 +1065,7 @@
         <article class="portfolio-card" data-category="uiux" data-title="UI/UX Design Projects"
           data-photos="pict/project-6-photo-1.jpg">
           <div class="card-media">
-            <img src="pict/project-6.jpg" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <img src="pict/project-6.jpg" alt="" draggable="false" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
             <span class="media-fallback" style="display:none;">PROJECT 6</span>
           </div>
           <div class="card-body">
@@ -1053,7 +1108,7 @@
           <p>Created high-quality 3D animation sequences using core animation principles to deliver engaging and dynamic visual content.</p>
         </div>
         <div class="tl-item">
-          <span class="tl-period">Sep 2021 - Mar 2022</span>
+          <span class="tl-period">Sep 2021 - Dec 2021</span>
           <h3>Susu Murni Suteja - F&B Attendant</h3>
           <p>Served fresh milk products with excellent customer service while maintaining high workspace cleanliness standards.</p>
         </div>
@@ -1134,6 +1189,66 @@
   }
 
   setTimeout(revealSite, 2000);
+})();
+
+/* ===================== CONTENT PROTECTION ===================== */
+(function(){
+  var ALLOW_TAGS = ['INPUT', 'TEXTAREA'];
+
+  // Block right-click context menu on images, videos, iframes and protected wrappers
+  document.addEventListener('contextmenu', function(e){
+    var target = e.target;
+    if(
+      target.tagName === 'IMG' ||
+      target.tagName === 'VIDEO' ||
+      target.tagName === 'IFRAME' ||
+      target.closest('img, video, iframe, .card-media, .profile-photo, .gallery-slide, .media-box, .social-icons a, .logo-link, .protect-shield')
+    ){
+      e.preventDefault();
+      return false;
+    }
+  });
+
+  // Block dragging images/videos out of the page (prevents drag-to-desktop save)
+  document.addEventListener('dragstart', function(e){
+    var target = e.target;
+    if(target.tagName === 'IMG' || target.tagName === 'VIDEO'){
+      e.preventDefault();
+      return false;
+    }
+  });
+
+  // Block common save/inspect shortcuts (deterrent only — not foolproof)
+  document.addEventListener('keydown', function(e){
+    var key = (e.key || '').toLowerCase();
+    var ctrlOrCmd = e.ctrlKey || e.metaKey;
+
+    // Ctrl/Cmd+S (save page), Ctrl/Cmd+U (view source)
+    if(ctrlOrCmd && (key === 's' || key === 'u')){
+      e.preventDefault();
+      return false;
+    }
+    // Ctrl/Cmd+Shift+I / J (devtools), Ctrl/Cmd+Shift+C (inspect element)
+    if(ctrlOrCmd && e.shiftKey && (key === 'i' || key === 'j' || key === 'c')){
+      e.preventDefault();
+      return false;
+    }
+    // F12 (devtools)
+    if(e.key === 'F12'){
+      e.preventDefault();
+      return false;
+    }
+  });
+
+  // Prevent selecting/copying image alt text via click-drag over media areas
+  document.addEventListener('selectstart', function(e){
+    var target = e.target;
+    if(ALLOW_TAGS.indexOf(target.tagName) !== -1) return;
+    if(target.closest('img, video, .card-media, .profile-photo, .gallery-slide, .media-box')){
+      e.preventDefault();
+      return false;
+    }
+  });
 })();
 
 (function(){
@@ -1261,14 +1376,14 @@
 
   var btnCv = document.querySelector('.btn-cv');
   if(btnCv && !reduceMotion){
-    btnCv.addEventListener('click', function(){
-      btnCv.classList.remove('pop');
-      void btnCv.offsetWidth;
-      btnCv.classList.add('pop');
-    });
-    btnCv.addEventListener('animationend', function(){
-      btnCv.classList.remove('pop');
-    });
+    var btnCvPress = function(){ btnCv.style.setProperty('--press', '0.88'); };
+    var btnCvRelease = function(){ btnCv.style.setProperty('--press', '1'); };
+    btnCv.addEventListener('mousedown', btnCvPress);
+    btnCv.addEventListener('mouseup', btnCvRelease);
+    btnCv.addEventListener('mouseleave', btnCvRelease);
+    btnCv.addEventListener('touchstart', btnCvPress, { passive:true });
+    btnCv.addEventListener('touchend', btnCvRelease);
+    btnCv.addEventListener('touchcancel', btnCvRelease);
   }
 
   var wasDesktopNav = isDesktopNav();
@@ -1459,6 +1574,29 @@
     });
   });
 
+  var profilePhoto = document.getElementById('profilePhoto');
+  var profilePhotoImg = profilePhoto ? profilePhoto.querySelector('img') : null;
+  if(profilePhoto && profilePhotoImg && !reduceMotion){
+    profilePhoto.addEventListener('mousemove', function(e){
+      var rect = profilePhoto.getBoundingClientRect();
+      var x = (e.clientX - rect.left) / rect.width - 0.5;
+      var y = (e.clientY - rect.top) / rect.height - 0.5;
+      profilePhotoImg.style.setProperty('--rx', (x * 16) + 'deg');
+      profilePhotoImg.style.setProperty('--ry', (y * -16) + 'deg');
+      profilePhotoImg.style.setProperty('--sc', '1');
+    });
+    profilePhoto.addEventListener('mouseenter', function(){
+      profilePhoto.classList.add('is-hovering');
+      profilePhotoImg.style.setProperty('--sc', '1');
+    });
+    profilePhoto.addEventListener('mouseleave', function(){
+      profilePhoto.classList.remove('is-hovering');
+      profilePhotoImg.style.setProperty('--rx', '0deg');
+      profilePhotoImg.style.setProperty('--ry', '0deg');
+      profilePhotoImg.style.removeProperty('--sc');
+    });
+  }
+
   var contactCard = document.querySelector('.contact-card');
   if(contactCard && !reduceMotion){
     contactCard.addEventListener('mousemove', function(e){
@@ -1483,12 +1621,13 @@
   var projectModalClose = document.getElementById('projectModalClose');
   var projectModalOverlay = document.getElementById('projectModalOverlay');
   var lastFocusedEl = null;
+  var currentGalleryCarousel = null;
 
   function buildYoutubeBox(videoId){
     var box = document.createElement('div');
     box.className = 'media-box media-video';
     var iframe = document.createElement('iframe');
-    iframe.setAttribute('src', 'https://www.youtube.com/embed/' + videoId);
+    iframe.setAttribute('src', 'https://www.youtube.com/embed/' + videoId + '?modestbranding=1&rel=0&disablekb=1');
     iframe.setAttribute('title', 'YouTube video player');
     iframe.setAttribute('frameborder', '0');
     iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
@@ -1498,23 +1637,168 @@
     return box;
   }
 
-  function buildPhotoBox(src, label){
-    var box = document.createElement('div');
-    box.className = 'media-box media-photo';
-    var img = document.createElement('img');
-    img.src = src;
-    img.alt = '';
-    img.onerror = function(){
-      img.style.display = 'none';
-      fallback.style.display = 'flex';
-    };
-    var fallback = document.createElement('span');
-    fallback.className = 'media-fallback-label';
-    fallback.style.display = 'none';
-    fallback.textContent = label;
-    box.appendChild(img);
-    box.appendChild(fallback);
-    return box;
+  /* Draggable "peek" gallery: one large centered photo, neighboring photos
+     cropped/scaled down on the sides. Works with mouse drag (desktop) and
+     touch swipe (mobile) via unified Pointer Events, plus arrow buttons,
+     dot indicators, and clicking a peeking photo to jump to it. */
+  function buildGalleryCarousel(photos){
+    var outer = document.createElement('div');
+    outer.className = 'gallery-wrap';
+
+    var carousel = document.createElement('div');
+    carousel.className = 'gallery-carousel';
+    carousel.tabIndex = 0;
+    carousel.setAttribute('role', 'group');
+    carousel.setAttribute('aria-roledescription', 'carousel');
+    outer.appendChild(carousel);
+
+    var track = document.createElement('div');
+    track.className = 'gallery-track';
+    carousel.appendChild(track);
+
+    var slides = photos.map(function(src, i){
+      var slide = document.createElement('div');
+      slide.className = 'gallery-slide';
+      slide.setAttribute('role', 'group');
+      slide.setAttribute('aria-roledescription', 'slide');
+      slide.setAttribute('aria-label', (i + 1) + ' of ' + photos.length);
+      var img = document.createElement('img');
+      img.src = src;
+      img.alt = '';
+      img.draggable = false;
+      var fallback = document.createElement('span');
+      fallback.className = 'media-fallback-label';
+      fallback.textContent = 'Photo ' + (i + 1);
+      img.onerror = function(){ img.style.display = 'none'; fallback.style.display = 'flex'; };
+      slide.appendChild(img);
+      slide.appendChild(fallback);
+      track.appendChild(slide);
+      return slide;
+    });
+
+    var multi = photos.length > 1;
+    var prevBtn = null, nextBtn = null, dotsWrap = null;
+
+    if(multi){
+      prevBtn = document.createElement('button');
+      prevBtn.type = 'button';
+      prevBtn.className = 'gallery-arrow prev';
+      prevBtn.setAttribute('aria-label', 'Previous photo');
+      prevBtn.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>';
+      nextBtn = document.createElement('button');
+      nextBtn.type = 'button';
+      nextBtn.className = 'gallery-arrow next';
+      nextBtn.setAttribute('aria-label', 'Next photo');
+      nextBtn.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>';
+      carousel.appendChild(prevBtn);
+      carousel.appendChild(nextBtn);
+
+      dotsWrap = document.createElement('div');
+      dotsWrap.className = 'gallery-dots';
+      photos.forEach(function(_, i){
+        var dot = document.createElement('button');
+        dot.type = 'button';
+        dot.className = 'gallery-dot';
+        dot.setAttribute('aria-label', 'Go to photo ' + (i + 1));
+        dotsWrap.appendChild(dot);
+      });
+      outer.appendChild(dotsWrap);
+    }
+
+    var activeIndex = 0;
+    var isDragging = false, startX = 0, baseTranslate = 0, dragDelta = 0, pointerId = null, moved = false;
+
+    function computeTranslate(index){
+      var containerWidth = carousel.clientWidth;
+      var slide = slides[index];
+      if(!slide) return 0;
+      return containerWidth / 2 - (slide.offsetLeft + slide.offsetWidth / 2);
+    }
+
+    function render(instant){
+      if(instant){ track.classList.add('no-transition'); }
+      slides.forEach(function(s, i){ s.classList.toggle('is-active', i === activeIndex); });
+      if(dotsWrap){
+        Array.prototype.forEach.call(dotsWrap.children, function(d, i){ d.classList.toggle('is-active', i === activeIndex); });
+      }
+      if(prevBtn) prevBtn.disabled = activeIndex === 0;
+      if(nextBtn) nextBtn.disabled = activeIndex === slides.length - 1;
+      track.style.transform = 'translateX(' + computeTranslate(activeIndex) + 'px)';
+      if(instant){
+        void track.offsetWidth;
+        track.classList.remove('no-transition');
+      }
+    }
+
+    function goTo(index){
+      activeIndex = Math.max(0, Math.min(slides.length - 1, index));
+      render(false);
+    }
+
+    if(prevBtn) prevBtn.addEventListener('click', function(){ goTo(activeIndex - 1); });
+    if(nextBtn) nextBtn.addEventListener('click', function(){ goTo(activeIndex + 1); });
+    if(prevBtn) prevBtn.addEventListener('pointerdown', function(e){ e.stopPropagation(); });
+    if(nextBtn) nextBtn.addEventListener('pointerdown', function(e){ e.stopPropagation(); });
+    if(dotsWrap){
+      Array.prototype.forEach.call(dotsWrap.children, function(dot, i){
+        dot.addEventListener('click', function(){ goTo(i); });
+      });
+    }
+
+    slides.forEach(function(slide, i){
+      slide.addEventListener('click', function(){
+        if(moved) return;
+        if(i !== activeIndex){ goTo(i); }
+      });
+    });
+
+    function onPointerDown(e){
+      if(slides.length < 2) return;
+      isDragging = true;
+      moved = false;
+      startX = e.clientX;
+      baseTranslate = computeTranslate(activeIndex);
+      dragDelta = 0;
+      pointerId = e.pointerId;
+      carousel.classList.add('dragging');
+      track.classList.add('no-transition');
+      try{ carousel.setPointerCapture(pointerId); }catch(err){}
+    }
+    function onPointerMove(e){
+      if(!isDragging) return;
+      dragDelta = e.clientX - startX;
+      if(Math.abs(dragDelta) > 4) moved = true;
+      track.style.transform = 'translateX(' + (baseTranslate + dragDelta) + 'px)';
+    }
+    function onPointerUp(){
+      if(!isDragging) return;
+      isDragging = false;
+      carousel.classList.remove('dragging');
+      track.classList.remove('no-transition');
+      var step = slides.length > 1 ? Math.abs(slides[1].offsetLeft - slides[0].offsetLeft) : 0;
+      var threshold = Math.max(40, step * 0.22);
+      if(dragDelta <= -threshold && activeIndex < slides.length - 1){ activeIndex++; }
+      else if(dragDelta >= threshold && activeIndex > 0){ activeIndex--; }
+      render(false);
+      try{ if(pointerId !== null) carousel.releasePointerCapture(pointerId); }catch(err){}
+      pointerId = null;
+      setTimeout(function(){ moved = false; }, 0);
+    }
+
+    carousel.addEventListener('pointerdown', onPointerDown);
+    carousel.addEventListener('pointermove', onPointerMove);
+    carousel.addEventListener('pointerup', onPointerUp);
+    carousel.addEventListener('pointercancel', onPointerUp);
+    carousel.addEventListener('pointerleave', function(e){ if(isDragging && e.buttons === 0){ onPointerUp(); } });
+    carousel.addEventListener('dragstart', function(e){ e.preventDefault(); });
+
+    carousel.addEventListener('keydown', function(e){
+      if(e.key === 'ArrowLeft'){ e.preventDefault(); goTo(activeIndex - 1); }
+      else if(e.key === 'ArrowRight'){ e.preventDefault(); goTo(activeIndex + 1); }
+    });
+
+    outer._refresh = function(){ render(true); };
+    return outer;
   }
 
   function openProjectModal(card){
@@ -1524,19 +1808,33 @@
     projectModalTag.textContent = tagEl ? tagEl.textContent : '';
 
     projectModalMedia.innerHTML = '';
+    projectModalMedia.classList.remove('has-carousel');
+    currentGalleryCarousel = null;
+
     if(card.dataset.youtube){
       projectModalMedia.appendChild(buildYoutubeBox(card.dataset.youtube));
     }
+
     var photos = (card.dataset.photos || '').split(',').map(function(p){ return p.trim(); }).filter(Boolean);
-    photos.forEach(function(src, i){
-      projectModalMedia.appendChild(buildPhotoBox(src, 'Photo ' + (i + 1)));
-    });
+    if(photos.length){
+      projectModalMedia.classList.add('has-carousel');
+      var carouselEl = buildGalleryCarousel(photos);
+      projectModalMedia.appendChild(carouselEl);
+      currentGalleryCarousel = carouselEl;
+    }
 
     lastFocusedEl = document.activeElement;
     document.body.style.overflow = 'hidden';
     projectModal.classList.add('open');
     projectModal.setAttribute('aria-hidden', 'false');
     projectModalClose.focus();
+
+    requestAnimationFrame(function(){
+      if(currentGalleryCarousel && currentGalleryCarousel._refresh){ currentGalleryCarousel._refresh(); }
+    });
+    setTimeout(function(){
+      if(currentGalleryCarousel && currentGalleryCarousel._refresh){ currentGalleryCarousel._refresh(); }
+    }, 360);
   }
   function closeProjectModal(){
     projectModal.classList.remove('open');
@@ -1545,10 +1843,15 @@
     setTimeout(function(){
       if(!projectModal.classList.contains('open')){
         projectModalMedia.innerHTML = '';
+        currentGalleryCarousel = null;
       }
     }, 300);
     if(lastFocusedEl){ lastFocusedEl.focus(); }
   }
+
+  window.addEventListener('resize', function(){
+    if(currentGalleryCarousel && currentGalleryCarousel._refresh){ currentGalleryCarousel._refresh(); }
+  });
 
   var TAP_MOVE_THRESHOLD = 10;
 
