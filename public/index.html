@@ -289,8 +289,7 @@
     display:flex; align-items:center; justify-content:center;
     width:100%; margin:0;
     max-height:0; opacity:0; overflow:hidden; pointer-events:none;
-    transition:background .3s ease, transform .3s ease,
-      max-height .4s cubic-bezier(.34,1.56,.64,1), opacity .3s ease, margin .4s cubic-bezier(.34,1.56,.64,1);
+    transition:background .3s ease, transform .2s cubic-bezier(.34,1.56,.64,1), max-height .4s cubic-bezier(.34,1.56,.64,1), opacity .3s ease, margin .4s cubic-bezier(.34,1.56,.64,1);
   }
   .vertical-menu.open a{
     max-height:60px; margin:14px 0; opacity:1; overflow:visible; pointer-events:auto;
@@ -299,6 +298,9 @@
     background:linear-gradient(to right, var(--purple), var(--blue));
     border-radius:20px;
     transform:translateY(-6px);
+  }
+  .vertical-menu a:active{
+    transform:scale(.8);
   }
   .vertical-menu img{
     width:20px; height:20px; object-fit:contain; margin:16px;
@@ -2036,6 +2038,10 @@
       link.removeAttribute('aria-hidden');
       i++;
     });
+    clearTimeout(openMenu._resetTimer);
+    openMenu._resetTimer = setTimeout(function(){
+      navLinks.forEach(function(link){ link.style.transitionDelay = '0ms'; });
+    }, navLinks.length * 55 + 400);
   }
   function closeMenu(){
     verticalMenu.classList.remove('open');
